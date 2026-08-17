@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BITCLUB Research · 빗썸 단독 상장 코인 대시보드</title>
+<meta name="description" content="빗썸에만 상장되고 업비트엔 없는 코인들의 해외 거래소 상장 현황. 매시간 자동 갱신.">
+<style>
+:root {
+    --bg: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-subtle: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-bg: #eff6ff;
+    --success: #059669;
+    --success-bg: #ecfdf5;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+.container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.header { display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 24px; border-bottom: 2px solid var(--text); margin-bottom: 32px;
+    flex-wrap: wrap; gap: 16px; }
+.brand { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 2px; margin-bottom: 6px; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+.subtitle { color: var(--text-muted); font-size: 14px; }
+.last-updated { text-align: right; font-size: 12px; color: var(--text-dim); }
+.last-updated .value { color: var(--success); font-weight: 600; font-size: 14px;
+    margin-top: 4px; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.pulse { display: inline-block; width: 8px; height: 8px; background: var(--success);
+    border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+.alert-banner { background: var(--accent-bg); border: 1px solid #bfdbfe;
+    border-left: 4px solid var(--accent); border-radius: 8px; padding: 18px 22px;
+    margin-bottom: 32px; display: none; align-items: center; gap: 16px; flex-wrap: wrap; }
+.alert-banner .icon { font-size: 24px; }
+.alert-banner .content { flex: 1; min-width: 260px; }
+.alert-banner .title { font-size: 13px; color: var(--accent); font-weight: 700;
+    margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.alert-banner .message { font-size: 15px; color: var(--text); }
+.alert-banner .added { color: var(--success); font-weight: 700; }
+.alert-banner .removed { color: var(--danger); font-weight: 700; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 32px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; transition: all 0.15s; }
+.stat-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08); }
+.stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+.stat-card .value { font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.stat-card.accent .value { color: var(--success); }
+.stat-card.warn .value { color: var(--warning); }
+.stat-card .change { font-size: 12px; color: var(--text-dim); }
+.stat-card .change.up { color: var(--success); font-weight: 600; }
+.stat-card .change.down { color: var(--danger); font-weight: 600; }
+.filters { background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; }
+.filters-title { font-size: 11px; color: var(--text-muted); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+.filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--bg-card); border: 1px solid var(--border-strong);
+    color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px;
+    cursor: pointer; transition: all 0.15s; user-select: none; font-weight: 500; }
+.chip:hover { color: var(--text); border-color: var(--accent); background: var(--accent-bg); }
+.chip.active { background: var(--text); color: white; border-color: var(--text); }
+.search-box { margin-top: 14px; position: relative; }
+.search-box input { width: 100%; background: var(--bg-subtle); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 14px 10px 40px; border-radius: 8px; font-size: 14px;
+    outline: none; transition: all 0.15s; font-family: inherit; }
+.search-box input:focus { border-color: var(--accent); background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.search-box::before { content: "🔍"; position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%); font-size: 14px; opacity: 0.5; }
+.table-wrapper { background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 32px; }
+.table-header { padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.table-title { font-size: 15px; font-weight: 700; }
+.count-badge { background: var(--accent-bg); color: var(--accent); padding: 3px 10px;
+    border-radius: 12px; font-size: 12px; margin-left: 8px; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--bg-subtle); color: var(--text-muted); font-weight: 700;
+    text-align: center; padding: 12px 8px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+th:first-child { text-align: left; padding-left: 22px; }
+td { padding: 12px 8px; border-bottom: 1px solid var(--border); font-size: 14px; text-align: center; }
+td:first-child { text-align: left; padding-left: 22px; }
+tr:hover td { background: var(--bg-subtle); }
+tr:last-child td { border-bottom: none; }
+tr.hidden { display: none; }
+.ticker { font-family: 'SF Mono', Monaco, Consolas, monospace; font-weight: 700;
+    color: var(--text); letter-spacing: 0.3px; }
+.ticker.warning::after { content: " ⚠️"; font-size: 11px; }
+.mark { font-size: 16px; line-height: 22px; display: inline-block; width: 22px;
+    height: 22px; border-radius: 50%; text-align: center; }
+.mark.yes { color: var(--success); background: var(--success-bg); }
+.mark.no { color: var(--text-dim); opacity: 0.3; }
+.badge-new { background: var(--success); color: white; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.newsletter { background: linear-gradient(135deg, var(--accent-bg), #f0f9ff);
+    border: 1px solid #bfdbfe; border-radius: 12px; padding: 32px 24px;
+    margin-bottom: 32px; text-align: center; }
+.newsletter h2 { font-size: 22px; margin-bottom: 8px; }
+.newsletter p { color: var(--text-muted); margin-bottom: 20px; font-size: 14px;
+    max-width: 500px; margin-left: auto; margin-right: auto; }
+.newsletter-form { display: flex; gap: 8px; max-width: 440px; margin: 0 auto; flex-wrap: wrap; }
+.newsletter-form input { flex: 1; min-width: 200px; background: white;
+    border: 1px solid var(--border-strong); color: var(--text); padding: 12px 16px;
+    border-radius: 8px; font-size: 14px; outline: none; transition: all 0.15s; font-family: inherit; }
+.newsletter-form input:focus { border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.newsletter-form button { background: var(--text); color: white; border: none;
+    padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.newsletter-form button:hover { background: var(--accent); transform: translateY(-1px); }
+.footer { text-align: center; color: var(--text-dim); font-size: 12px;
+    padding-top: 24px; border-top: 1px solid var(--border); }
+.footer a { color: var(--text-muted); text-decoration: none; font-weight: 500; }
+.footer a:hover { color: var(--accent); }
+.footer .disclaimer { margin-top: 12px; font-size: 11px; opacity: 0.7; }
+@media (max-width: 640px) {
+    .container { padding: 20px 16px; }
+    h1 { font-size: 22px; }
+    .stat-card .value { font-size: 26px; }
+    table { font-size: 12px; }
+    th, td { padding: 10px 6px; }
+    th:first-child, td:first-child { padding-left: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+    <div>
+        <div class="brand">BITCLUB · COIN RESEARCH</div>
+        <h1>빗썸 단독 상장 코인 대시보드</h1>
+        <div class="subtitle">차트로 검증하는 리서치 · 매시간 자동 갱신</div>
+    </div>
+    <div class="last-updated">
+        마지막 갱신
+        <div class="value"><span class="pulse"></span>2026-08-18 08:49 KST</div>
+    </div>
+</div>
+
+<div class="alert-banner">
+    <div class="icon">🔔</div>
+    <div class="content">
+        <div class="title">지난 갱신 대비 변동사항</div>
+        <div class="message">첫 실행 · 다음 갱신부터 변동사항이 표시됩니다</div>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">최종 후보</div>
+        <div class="value">100</div>
+        <div class="change">첫 측정</div>
+    </div>
+    <div class="stat-card accent">
+        <div class="label">바이낸스 선물</div>
+        <div class="value">74</div>
+        <div class="change">펀딩비 캡처 가능</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">4개 거래소 모두</div>
+        <div class="value">26</div>
+        <div class="change">유동성 최상위</div>
+    </div>
+    <div class="stat-card warn">
+        <div class="label">티커 검증 필요</div>
+        <div class="value">4</div>
+        <div class="change">충돌 의심 종목</div>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filters-title">필터</div>
+    <div class="filter-chips">
+        <span class="chip active" data-filter="all">전체 (100)</span>
+        <span class="chip" data-filter="bn-fut">바이낸스 선물만 (74)</span>
+        <span class="chip" data-filter="all4">4개 거래소 모두 (26)</span>
+        <span class="chip" data-filter="new">신규 진입 (0)</span>
+    </div>
+    <div class="search-box">
+        <input type="text" id="search" placeholder="티커 검색... (예: BNB, POPCAT)">
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <div class="table-header">
+        <div>
+            <span class="table-title">전체 종목 현황</span>
+            <span class="count-badge" id="count-badge">100종</span>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>티커</th>
+                <th>BN 현물</th>
+                <th>BN 선물</th>
+                <th>코인베이스</th>
+                <th>크라켄</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        <tr data-ticker="A8"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">A8</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ACE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">ACE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ACH"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">ACH</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ACX"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">ACX</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ALICE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">ALICE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="AMP"
+            data-bn-spot="1"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">AMP</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="AR"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">AR</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ASTER"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">ASTER</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BANK"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">BANK</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BASED"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">BASED</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BB"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker warning">BB</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BEL"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">BEL</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BICO"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">BICO</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BILL"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">BILL</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BLUE"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">BLUE</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BMT"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">BMT</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BNB"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">BNB</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BOB"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">BOB</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BOBA"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">BOBA</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BTR"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">BTR</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="C"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker warning">C</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="C98"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">C98</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CAKE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">CAKE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CAMP"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">CAMP</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CELR"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">CELR</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CHECK"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">CHECK</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="COOKIE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">COOKIE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="COTI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">COTI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CSPR"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">CSPR</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="CTK"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">CTK</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="DBR"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">DBR</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="DEXE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">DEXE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="DYDX"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">DYDX</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="EDGEX"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">EDGEX</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="EDU"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">EDU</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="EIGEN"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">EIGEN</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="FET"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">FET</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="FLOKI"
+            data-bn-spot="1"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">FLOKI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="FLR"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">FLR</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="FLUX"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">FLUX</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="FRAX"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">FRAX</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GALA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">GALA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GMX"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">GMX</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GNO"
+            data-bn-spot="1"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">GNO</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GPS"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">GPS</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GRASS"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">GRASS</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="GWEI"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">GWEI</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="HEMI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">HEMI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="HFT"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">HFT</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="HNT"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">HNT</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ILV"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">ILV</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="JOE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">JOE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="KAIA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">KAIA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="KSM"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">KSM</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="LISTA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">LISTA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="MANTA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">MANTA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="MAV"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">MAV</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="MERL"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">MERL</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="MET"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">MET</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="METIS"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">METIS</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="NIL"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">NIL</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PARTI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">PARTI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PHA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">PHA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PONKE"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">PONKE</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="POPCAT"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">POPCAT</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PROMPT"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">PROMPT</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PUMPBTC"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">PUMPBTC</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="PYR"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">PYR</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="RECALL"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">RECALL</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="REQ"
+            data-bn-spot="1"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">REQ</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="REZ"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">REZ</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ROBO"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">ROBO</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="RPL"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">RPL</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="S"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker warning">S</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SAPIEN"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">SAPIEN</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SD"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">SD</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SFP"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">SFP</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SKL"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">SKL</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SOLV"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">SOLV</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SPACE"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">SPACE</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="STABLE"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">STABLE</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="STRK"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">STRK</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SUNDOG"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">SUNDOG</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SUSHI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">SUSHI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="SXT"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">SXT</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="THE"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">THE</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="THQ"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">THQ</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="TOWNS"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">TOWNS</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="TRB"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="0"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">TRB</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="TURBO"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">TURBO</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="UB"
+            data-bn-spot="0"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">UB</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="UMA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">UMA</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="UP"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker warning">UP</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="WAXL"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">WAXL</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="WOO"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="3">
+            <td><span class="ticker">WOO</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="XAI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">XAI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="XVS"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="0"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">XVS</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+        </tr>
+    
+
+        <tr data-ticker="XYO"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="2">
+            <td><span class="ticker">XYO</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="YFI"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="1"
+            data-kr="1"
+            data-new="0"
+            data-count="4">
+            <td><span class="ticker">YFI</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="ZRC"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="0"
+            data-count="1">
+            <td><span class="ticker">ZRC</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+        </tbody>
+    </table>
+</div>
+
+<div class="newsletter">
+    <h2>📬 변동사항 이메일 알림</h2>
+    <p>신규 상장이나 업비트 진입 등 리스트 변동이 발생하면 이메일로 알려드립니다. 무료 · 언제든 구독 취소.</p>
+    <div class="newsletter-form">
+        <input type="email" placeholder="이메일 주소 (준비 중)" disabled>
+        <button disabled>구독하기</button>
+    </div>
+</div>
+
+<div class="footer">
+    <div>© 2026 BITCLUB Research · 차트스트레이트</div>
+    <div class="disclaimer">
+        본 자료는 정보 제공 목적이며 투자 조언이 아닙니다.<br>
+        데이터: Bithumb, Upbit, Binance, Coinbase, Kraken, CoinGecko Public API
+    </div>
+</div>
+
+</div>
+
+<script>
+// 필터링 및 검색 로직
+const chips = document.querySelectorAll('.chip');
+const search = document.getElementById('search');
+const tbody = document.getElementById('tbody');
+const countBadge = document.getElementById('count-badge');
+let currentFilter = 'all';
+
+function applyFilters() {
+    const searchTerm = search.value.toUpperCase();
+    const rows = tbody.querySelectorAll('tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const ticker = row.dataset.ticker || '';
+        const bnFut = row.dataset.bnFut === '1';
+        const count = parseInt(row.dataset.count || '0');
+        const isNew = row.dataset.new === '1';
+
+        let filterMatch = true;
+        if (currentFilter === 'bn-fut') filterMatch = bnFut;
+        else if (currentFilter === 'all4') filterMatch = count === 4;
+        else if (currentFilter === 'new') filterMatch = isNew;
+
+        const searchMatch = !searchTerm || ticker.includes(searchTerm);
+
+        if (filterMatch && searchMatch) {
+            row.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            row.classList.add('hidden');
+        }
+    });
+
+    countBadge.textContent = visibleCount + '종';
+}
+
+chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        applyFilters();
+    });
+});
+
+search.addEventListener('input', applyFilters);
+</script>
+
+</body>
+</html>
