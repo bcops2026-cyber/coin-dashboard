@@ -155,7 +155,7 @@ tr.hidden { display: none; }
     </div>
     <div class="last-updated">
         마지막 갱신
-        <div class="value"><span class="pulse"></span>2026-08-26 17:53 KST</div>
+        <div class="value"><span class="pulse"></span>2026-09-18 03:07 KST</div>
     </div>
 </div>
 
@@ -163,15 +163,15 @@ tr.hidden { display: none; }
     <div class="icon">🔔</div>
     <div class="content">
         <div class="title">지난 갱신 대비 변동사항</div>
-        <div class="message">이전 갱신 대비 변동 없음</div>
+        <div class="message"><span class="added">+3 신규 진입</span> (AVA, AVL, BONK) · <span class="removed">-1 이탈</span> (REZ)</div>
     </div>
 </div>
 
 <div class="stats-grid">
     <div class="stat-card">
         <div class="label">최종 후보</div>
-        <div class="value">96</div>
-        <div class="change">변동 없음</div>
+        <div class="value">98</div>
+        <div class="change up">+2 vs 직전</div>
     </div>
     <div class="stat-card accent">
         <div class="label">바이낸스 선물</div>
@@ -180,7 +180,7 @@ tr.hidden { display: none; }
     </div>
     <div class="stat-card">
         <div class="label">4개 거래소 모두</div>
-        <div class="value">25</div>
+        <div class="value">24</div>
         <div class="change">유동성 최상위</div>
     </div>
     <div class="stat-card warn">
@@ -193,10 +193,10 @@ tr.hidden { display: none; }
 <div class="filters">
     <div class="filters-title">필터</div>
     <div class="filter-chips">
-        <span class="chip active" data-filter="all">전체 (96)</span>
+        <span class="chip active" data-filter="all">전체 (98)</span>
         <span class="chip" data-filter="bn-fut">바이낸스 선물만 (70)</span>
-        <span class="chip" data-filter="all4">4개 거래소 모두 (25)</span>
-        <span class="chip" data-filter="new">신규 진입 (0)</span>
+        <span class="chip" data-filter="all4">4개 거래소 모두 (24)</span>
+        <span class="chip" data-filter="new">신규 진입 (3)</span>
     </div>
     <div class="search-box">
         <input type="text" id="search" placeholder="티커 검색... (예: BNB, POPCAT)">
@@ -207,7 +207,7 @@ tr.hidden { display: none; }
     <div class="table-header">
         <div>
             <span class="table-title">전체 종목 현황</span>
-            <span class="count-badge" id="count-badge">96종</span>
+            <span class="count-badge" id="count-badge">98종</span>
         </div>
     </div>
     <table>
@@ -222,6 +222,51 @@ tr.hidden { display: none; }
         </thead>
         <tbody id="tbody">
             
+        <tr data-ticker="AVA"
+            data-bn-spot="1"
+            data-bn-fut="1"
+            data-cb="0"
+            data-kr="1"
+            data-new="1"
+            data-count="3">
+            <td><span class="ticker">AVA</span><span class="badge-new">NEW</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="AVL"
+            data-bn-spot="0"
+            data-bn-fut="0"
+            data-cb="0"
+            data-kr="1"
+            data-new="1"
+            data-count="1">
+            <td><span class="ticker">AVL</span><span class="badge-new">NEW</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
+        <tr data-ticker="BONK"
+            data-bn-spot="1"
+            data-bn-fut="0"
+            data-cb="1"
+            data-kr="1"
+            data-new="1"
+            data-count="3">
+            <td><span class="ticker">BONK</span><span class="badge-new">NEW</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
+            <td><span class="mark yes">●</span></td>
+        </tr>
+    
+
         <tr data-ticker="A8"
             data-bn-spot="0"
             data-bn-fut="0"
@@ -870,14 +915,14 @@ tr.hidden { display: none; }
         <tr data-ticker="GRASS"
             data-bn-spot="0"
             data-bn-fut="1"
-            data-cb="0"
+            data-cb="1"
             data-kr="1"
             data-new="0"
-            data-count="2">
+            data-count="3">
             <td><span class="ticker">GRASS</span></td>
             <td><span class="mark no">·</span></td>
             <td><span class="mark yes">●</span></td>
-            <td><span class="mark no">·</span></td>
+            <td><span class="mark yes">●</span></td>
             <td><span class="mark yes">●</span></td>
         </tr>
     
@@ -1207,21 +1252,6 @@ tr.hidden { display: none; }
             <td><span class="ticker">REQ</span></td>
             <td><span class="mark yes">●</span></td>
             <td><span class="mark no">·</span></td>
-            <td><span class="mark yes">●</span></td>
-            <td><span class="mark yes">●</span></td>
-        </tr>
-    
-
-        <tr data-ticker="REZ"
-            data-bn-spot="1"
-            data-bn-fut="1"
-            data-cb="1"
-            data-kr="1"
-            data-new="0"
-            data-count="4">
-            <td><span class="ticker">REZ</span></td>
-            <td><span class="mark yes">●</span></td>
-            <td><span class="mark yes">●</span></td>
             <td><span class="mark yes">●</span></td>
             <td><span class="mark yes">●</span></td>
         </tr>
