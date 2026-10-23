@@ -1,5 +1,27 @@
 [
   {
+    "timestamp": "2026-10-23 13:31",
+    "added": [
+      "ACU",
+      "AIA",
+      "AT",
+      "BR",
+      "DEBIT",
+      "KGEN",
+      "Q",
+      "US",
+      "XDP",
+      "ZEST"
+    ],
+    "removed": [
+      "GALA",
+      "KAIA",
+      "PUMPBTC",
+      "SUNDOG"
+    ],
+    "total": 104
+  },
+  {
     "timestamp": "2026-09-18 03:07",
     "added": [
       "AVA",
